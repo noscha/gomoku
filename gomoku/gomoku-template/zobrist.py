@@ -1,5 +1,8 @@
 import random
+import numpy as np
 from constants import Piece
+
+
 class Zobrist:
     """
     Diese Klasse ist zur Berechnung der Hash-Werte von Gomoku Stellungen zuständig.
@@ -7,7 +10,8 @@ class Zobrist:
     """
 
     def __init__(self) -> None:
-        pass
+        self.white = np.random.randint(2**15 - 1, 2**31 - 1, size=(15, 15))
+        self.black = np.random.randint(2**15 - 1, 2**31 - 1, size=(15, 15))
 
     def update_hash(self, old_hash: int, row: int, col: int, player: int) -> int:
         """
@@ -15,4 +19,4 @@ class Zobrist:
         gemachten Zug übergeben. Daraus berechnet die Methode den neuen Hashwert der Stellung
         und gibt diesen zurück.
         """
-        pass
+        return old_hash ^ self.white[row, col] if player == Piece.WHITE.value else old_hash ^ self.black[row, col]
