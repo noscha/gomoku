@@ -107,6 +107,7 @@ class AlphaBetaEngine:
         else:
             b = float('inf')
             for row, col, t in self.game_state.get_sorted_moves():
+                self.nodes += 1
                 self.game_state.make_move(row, col)
                 score, move = self.alpha_beta(depth + 1, remaining_depth - 1, -player, alpha, beta)
                 self.game_state.undo_move()
