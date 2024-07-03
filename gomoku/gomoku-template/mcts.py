@@ -8,10 +8,6 @@ import threading
 
 
 class MonteCarloNode:
-    """
-    TODO: Implement
-    """
-    i = 0
 
     def __init__(self, move=None, parent=None):
         self.move = move
@@ -21,21 +17,12 @@ class MonteCarloNode:
         self.visited_children = set()
         self.children = []
 
-        # delete later
-        self.i = MonteCarloNode.i
-        MonteCarloNode.i += 1
-
-    def __str__(self):
-        return str(self.move)
-
 
 class MonteCarloEngine:
 
     def __init__(self, board=None, player=Piece.BLACK.value) -> None:
-        self.game_state = GameState(board, player)  # TODO zobrist?
-
-        # TODO: Change if necessary
-        self.root_node = MonteCarloNode()
+        self.game_state = GameState(board, player)
+        self.root_node = None
 
         self.identity = player
         self.current_result = (-1, -1)
@@ -85,6 +72,7 @@ class MonteCarloEngine:
         wenn von GUI das Stoppsignal kommt.
 
         """
+        self.root_node = MonteCarloNode()
         k = 0
         simulation_depth = 10
         while not self.stop_event.is_set() and k < iterations:
@@ -102,7 +90,7 @@ class MonteCarloEngine:
         """
         Select next node to explore / exploit
         """
-        while not self.is_terminal(node.reward):
+        while not self.is_terminal(self.game_state.get_heuristic_value()):
             moves = [(col, row) for col, row, _ in self.game_state.get_sorted_moves()]
             if len(moves) > len(node.visited_children):
                 move = moves.pop()
@@ -135,7 +123,7 @@ class MonteCarloEngine:
         then uses evaluation function to estimate reward.
         """
         reward, changes = 0, 0
-        while depth > 0 and not self.is_terminal(reward):
+        while depth > 0 and not self.is_terminal(self.game_state.get_heuristic_value()):
             row, col, t = random.choice(self.game_state.get_sorted_moves())
             self.game_state.make_move(row, col)
             reward = self.game_state.get_heuristic_value()
@@ -165,4 +153,4 @@ class MonteCarloEngine:
         """
         Returns the most visited node.
         """
-        return max(node.children, key=lambda child: child.visits)
+        return max(node.children, key=lambda child: child.visits).move
